@@ -1,6 +1,7 @@
 ﻿from flask import Flask, request, render_template
 from datetime import datetime
 import json
+import lxml.html
 
 app = Flask(__name__)
 
@@ -14,6 +15,11 @@ def load_messages():
 
 
 all_messages = load_messages()
+
+
+def filter_text(text):
+    t = lxml.html.fromstring(text).text_content()
+    return t
 
 
 def save_messages():
@@ -46,7 +52,7 @@ def print_all_messages():
 
 @app.route("/")
 def main_page():
-    return "Hello, welcome to SkillChat"
+    return "Hello, welcome to SimpleWebChat"
 
 
 @app.route("/get_messages")
@@ -56,8 +62,8 @@ def get_messages():
 
 @app.route("/send_message")
 def send_message():
-    text = request.args["text"]
-    sender = request.args["name"]
+    text = filter_text(request.args["text"])
+    sender = filter_text(request.args["name"])
     add_message(text, sender)
     return "OK"
 
